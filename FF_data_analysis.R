@@ -23,11 +23,8 @@ colnames(pointsAgainst) <- c("Owner", "Week", "PointsAgainst")
 points <- inner_join(pointsFor, pointsAgainst, by = c("Owner" = "Owner", "Week" = "Week"))
 points$Week <- as.numeric(points$Week)
 
-
-Player <- list()
-
 names <- as.character(ff_data$Owner)
-
+Player <- list()
 for (name in names) {
   Player <- c(Player, list(filter(points, Owner == name)))
 }
