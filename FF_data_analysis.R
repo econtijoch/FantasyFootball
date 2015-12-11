@@ -69,8 +69,8 @@ for (matchup in names(matchups)) {
 schedule_compare <- group_by(matchup_scramble, Owner) %>% summarize(AvgScrambledWinPct = mean(WinPct))
 schedule_compare <- full_join(schedule_compare, ff_data[, c("Owner", "WinPct")])
 colnames(schedule_compare) <- c("Owner", "ScrambledPct", "ActualPct")
-schedule_compare$Differential <- schedule_compare$ActualPct - schedule_compare$ScrambledPct
-schedule_compare <- schedule_compare %>% select(Owner, ActualPct, ScrambledPct, Differential)
+schedule_compare$ScramDifferential <- schedule_compare$ActualPct - schedule_compare$ScrambledPct
+schedule_compare <- schedule_compare %>% select(Owner, ActualPct, ScrambledPct, ScramDifferential)
 
 
 
@@ -84,5 +84,16 @@ for (i in 1:length(Player)){
 }
 
 correlation_metadata <- full_join(correlations, ff_data[, 1:13])
+
+pythag_winpct <- data.frame(Owner = character(), PWinPct = double())
+for ( i in 1:length(Player)){
+  PF <- sum(Player[[i]]$PointsFor, na.rm = T)
+  PA <- sum(Player[[i]]$PointsAgainst, na.rm = T)
+  ppct <- data.frame(Owner = Player[[i]]$Owner[1], PWinPct = (PF^2.37)/(PF^2.37 + PA^2.37))
+  pythag_winpct <- rbind(pythag_winpct, ppct)
+}
+
+schedule_compare <- left_join(schedule_compare, pythag_winpct, by = "Owner")
+schedule_compare$PythDifferential <- schedule_compare$ActualPct - schedule_compare$PWinPct
 
 
