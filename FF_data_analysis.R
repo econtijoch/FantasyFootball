@@ -96,4 +96,14 @@ for ( i in 1:length(Player)){
 schedule_compare <- left_join(schedule_compare, pythag_winpct, by = "Owner")
 schedule_compare$PythDifferential <- schedule_compare$ActualPct - schedule_compare$PWinPct
 
+pvalue_table <- data.frame(Owner = character(), Pvalue = double())
+for (i in 1:length(Player)){
+  Owner <- Player[[i]]$Owner[1]
+  Pvalue <- t.test(Player[[i]]$PointsFor, do.call(rbind, Player[-i])$PointsFor)$p.value
+  pval <- data.frame(Owner = Owner, Pvalue = Pvalue)
+  pvalue_table <- rbind(pvalue_table, pval)
+  p <- ggplot() + geom_density(data =  do.call(rbind, Player[-i]), aes(PointsFor), fill = 'blue', alpha = 0.2) + geom_density(data = Player[[i]], aes(PointsFor), fill = 'red', alpha = 0.2) + labs(title = paste(Owner, "(Red) vs Rest (Blue)", sep = " "), x = "Points") + theme_classic()
+  print(p)
+}
+
 
